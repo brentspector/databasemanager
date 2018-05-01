@@ -1,0 +1,33 @@
+<div>
+    <div class="container">
+        <form class="my-3" (ngSubmit)="getTableData()" [formGroup]="tableChoice">
+            <p>Select what tables you would like to view</p>
+            <div class="form-check" *ngFor="let table of tableList">
+                <label for="{{table}}" class="col-sm-2 col-form-label">{{table}}</label>
+                <input type="checkbox" name="{{table}}" id="{{table}}" [formControlName]="table"/>
+            </div>
+            <div class="form-group row">
+                <button type="submit" [disabled]="!tableChoice.valid">Submit</button>
+                <button routerLink="/">Back</button>
+            </div>
+        </form>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2" style="overflow:scroll;overflow-x:hidden;height:300px;">
+                <ngb-tabset type="pills" orientation="vertical" (tabChange)="toggleShow($event)" *ngIf="tableTest[0].name">
+                    <ngb-tab title={{key.name}} id={{i}} *ngFor="let key of tableTest;index as i">
+                        <ng-template ngbTabContent></ng-template>
+                    </ngb-tab>
+                </ngb-tabset>
+            </div>
+            <div class="col-md-10" [ngSwitch]="getShowTable()">
+                <ng-template ngFor let-key [ngForOf]="tableTest" let-i="index">
+                    <dexih-table [data]="key.contents" [heading]="key.name" *ngSwitchCase="i">
+                    </dexih-table>
+                </ng-template>  
+                <app-table-edit></app-table-edit>  
+            </div>
+        </div>
+    </div>
+</div>

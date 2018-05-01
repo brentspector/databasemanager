@@ -1,0 +1,24 @@
+<ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">Modal title</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form (ngSubmit)="submitNewRecord()" [formGroup]="modalGroup">
+          <div class="form-group">
+              <ng-template ngFor let-column [ngForOf]="modalFields"> 
+                <label for="{{column}}">{{column}}</label>
+                <input type="text" name="{{column}}" [formControlName]="column"/>
+              </ng-template>
+          </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-primary" (click)="submitNewRecord()">Submit</button>
+      <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
+    </div>
+  </ng-template>
+  
+  <button class="btn btn-outline-primary" (click)="open(content)">Add Row</button>

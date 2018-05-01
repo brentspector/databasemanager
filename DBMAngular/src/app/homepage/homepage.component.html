@@ -1,0 +1,38 @@
+<div class="container my-3">
+    <p>Enter the details of the database you would like to view</p>
+    <form (ngSubmit)="getDatabase()" [formGroup]="credentialsGroup">
+        <div class="row">
+            <div class="input-group mb-3 col-5">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">DB Address</span>
+                </div>
+                <input type="text" class="form-control"
+                formControlName="url"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-group mb-3 col-5">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">DB Username/Schema</span>
+                </div>
+                <input type="text" class="form-control"
+                formControlName="username"/>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-group mb-3 col-5">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Password</span>
+                </div>
+                <input type="password" class="form-control"
+                formControlName="password" />
+            </div>
+        </div>
+        <input type="submit"/>
+    </form>
+</div>
+<div class="container">
+    <p>Or create a new table</p>
+    <button class="btn btn-outline-primary" routerLink="/upload" ngbbutton>To Upload</button>
+</div>
+
