@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-homepage',
@@ -14,14 +14,14 @@ export class HomepageComponent implements OnInit {
 
   ngOnInit() {
     this.credentialsGroup = new FormGroup({
-      url: new FormControl(),
-      username: new FormControl(),
-      password: new FormControl()
+      url: new FormControl('', [Validators.required, Validators.maxLength(100),
+         Validators.pattern('/^https?:\/\/[\-\w]+(\.[\-\w]+)*(:[0-9]+)?\/?(\/[.\-\w]*)*$/')]),
+      username: new FormControl('', [Validators.required, Validators.maxLength(25), Validators.pattern('^[\w\.]+')]),
+      password: new FormControl('', [Validators.required, Validators.maxLength(25)])
     });
   }
 
   getDatabase() {
     console.log(this.credentialsGroup.value);
   }
-
 }

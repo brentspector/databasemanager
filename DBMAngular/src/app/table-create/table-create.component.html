@@ -1,4 +1,18 @@
-<div>
-    Create View
-<button routerLink="/">Go Back</button>
+<div class="container">
+    <div class="form-group">
+        {{uploadResult}}
+        <label class="btn btn-primary">
+            Upload CSV or INI File <input type="file" id="file" (change)="submitFile($event.target.files)" hidden>
+        </label>
+        <div>
+            <button *ngIf="fileResult" class="btn btn-success" (click)="confirmUpload()">Confirm Upload</button>
+            <button class="btn btn-dark" routerLink="/">Go Back</button>
+        </div>
+    </div>
+    <div *ngIf="fileResult">
+        <ng-template ngFor let-key [ngForOf]="fileResult">
+            <dexih-table [data]="key.contents" [heading]="key.name">
+            </dexih-table>
+        </ng-template>
+    </div>
 </div>

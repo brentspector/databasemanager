@@ -12,6 +12,8 @@ import { TableEditComponent } from './table-edit/table-edit.component';
 import { TableDataService } from './table-data.service';
 import { DexihTableModule } from 'dexih-ngx-table';
 import { AppHeaderComponent } from './app-header/app-header.component';
+import { MessengerComponent } from './messenger/messenger.component';
+import { MessageService } from './message.service';
 
 
 @NgModule({
@@ -21,13 +23,14 @@ import { AppHeaderComponent } from './app-header/app-header.component';
     TableViewComponent,
     HomepageComponent,
     TableEditComponent,
-    AppHeaderComponent
+    AppHeaderComponent,
+    MessengerComponent
   ],
   imports: [
     BrowserModule, FormsModule, ReactiveFormsModule, NgbModule.forRoot(),
     AppRoutingModule, DexihTableModule
   ],
-  providers: [TableDataService],
+  providers: [TableDataService, MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

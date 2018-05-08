@@ -1,0 +1,9 @@
+<div class="my-3">
+  <ng-template [ngIf]="messageService.messages.length > 0">
+    <div class="row justify-content-center" *ngFor="let key of messageService.messages">
+      <div [ngClass]="'alert alert-'+key.result+' col-5 text-center'">
+        {{key.comment}}
+      </div>
+    </div>
+  </ng-template>
+</div>
