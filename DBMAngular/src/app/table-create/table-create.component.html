@@ -1,18 +1,79 @@
 <div class="container">
-    <div class="form-group">
+    <div class="form-group" [formGroup]="credentialsGroup">
         {{uploadResult}}
         <label class="btn btn-primary">
             Upload CSV or INI File <input type="file" id="file" (change)="submitFile($event.target.files)" hidden>
         </label>
+        <div *ngIf="fileResult">
+            <div class="row">
+                <div class="input-group mb-3 col-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">DB Address</span>
+                    </div>
+                    <input type="text" class="form-control"
+                    formControlName="url"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-group mb-3 col-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">DB Username/Schema</span>
+                    </div>
+                    <input type="text" class="form-control"
+                    formControlName="username"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-group mb-3 col-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Password</span>
+                    </div>
+                    <input type="password" class="form-control"
+                    formControlName="password" />
+                </div>
+            </div>
+        </div>
         <div>
             <button *ngIf="fileResult" class="btn btn-success" (click)="confirmUpload()">Confirm Upload</button>
             <button class="btn btn-dark" routerLink="/">Go Back</button>
         </div>
     </div>
-    <div *ngIf="fileResult">
+    <div class="container my-3" *ngIf="fileResult">
+        {{tableGroup.value|json}}
         <ng-template ngFor let-key [ngForOf]="fileResult">
             <dexih-table [data]="key.contents" [heading]="key.name">
             </dexih-table>
+            <form [formGroup]="tableGroup">
+                <div class="form-group">
+                    <ng-template ngFor let-column [ngForOf]="tableFields">
+                        <label for="{{column}}">{{column}}</label>
+                        <div class="col">
+                            <div ngbDropdown class="d-inline-block">
+                                <button class="btn btn-outline-primary" id="{{column}}" ngbDropdownToggle>{{tableGroup.value[column]}}</button>
+                                <div ngbDropdownMenu aria-labelledby="column">
+                                    <button class="dropdown-item" (click)="updateFormGroup(column, 'Text')">Text</button>
+                                    <button class="dropdown-item" (click)="updateFormGroup(column, 'Number')">Number</button>
+                                    <button class="dropdown-item" (click)="updateFormGroup(column, 'Date')">Date</button>
+                                    <button class="dropdown-item" (click)="updateFormGroup(column, 'DTime')">Date and Time</button>
+                                </div>
+                            </div>
+                            <div [ngbCollapse]="tableGroup.value[column]!=='Number'">
+                                Maximum Length of Digits <input type="number" [min]=1 [max]=31 [step]=1 formControlName="{{column}}var1"/>
+                                Number of Decimal Places <input type="number" [min]=0 [max]=31 [step]=1 formControlName="{{column}}var2"/>
+                            </div>
+                            <div [ngbCollapse]="tableGroup.value[column]!=='Date'">
+                                Date Format (M for Month, D for Day, Y for Year. Ex. MM-DD-YYYY)
+                                <input type="text" pattern="[DMY/-]" [min]=6 [max]=11 formControlName="{{column}}var1"/>
+                            </div>
+                            <div [ngbCollapse]="tableGroup.value[column]!=='DTime'">
+                                DateTime Format (M for Month, D for Day, Y for Year, H for Hour, N for Minute, S for Second. 
+                                Ex. MM-DD-YYYY HH:NN:SS)
+                                <input type="text" pattern="[DHMNSY :/-]" [min]=12 [max]=20 formControlName="{{column}}var1"/>
+                            </div>
+                        </div>
+                    </ng-template>
+                </div>
+            </form>
         </ng-template>
     </div>
 </div>
