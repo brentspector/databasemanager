@@ -107,6 +107,7 @@ export class TableCreateComponent implements OnInit {
   }
 
   private updateFormGroup(column: string, newValue: string) {
+    console.log(newValue);
     this.tableGroup.value[column] = newValue;
   }
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { MessageService } from '../message.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-homepage',
@@ -11,7 +12,7 @@ export class HomepageComponent implements OnInit {
 
   credentialsGroup: FormGroup;
 
-  constructor(private messageService: MessageService) { }
+  constructor(private messageService: MessageService, private router: Router) { }
 
   ngOnInit() {
     this.credentialsGroup = new FormGroup({
@@ -73,6 +74,7 @@ export class HomepageComponent implements OnInit {
 
     if (formValid) {
       console.log(this.credentialsGroup.value);
+      this.router.navigateByUrl('/view');
     }
   }
 }
