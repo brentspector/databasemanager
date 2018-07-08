@@ -29,7 +29,7 @@ export class TableDataService {
 
   constructor(private messageService: MessageService) { }
 
-  postFile(file: File) {
+  postFile(file: File, fileType: string) {
     // TODO: Get error message from return and submit to handle error
     return of(this.fileStatus).pipe(catchError(this.handleError('Submit table file', [])));
   }

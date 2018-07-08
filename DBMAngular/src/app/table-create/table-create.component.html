@@ -4,6 +4,7 @@
         <dexih-table [data]="fileResult[0].contents" [heading]="fileResult[0].name">
         </dexih-table>
         <div ngbDropdown *ngFor="let key of fileResult[0].headers"> 
+            <h6>{{key}}</h6>
             <button class="btn btn-outline-primary" id="{{key}}" ngbDropdownToggle>{{tableGroup.value[key]}}</button>
             <div ngbDropdownMenu aria-labelledby="key">
                 <button class="dropdown-item" (click)="updateFormGroup(key, 'Text')">Text</button>
@@ -28,6 +29,14 @@
     </div>
     <div class="form-group" [formGroup]="credentialsGroup">
         {{uploadResult}}
+        <div ngbDropdown>
+            <button class="btn btn-outline-primary" id="dropdownConfig" ngbDropdownToggle>Choose File Type</button>
+            <div ngbDropdownMenu aria-labelledby="dropdownConfig">
+              <button class="dropdown-item" (click)="setFileType('Auto')">Auto-Detect</button>
+              <button class="dropdown-item" (click)="setFileType('CSV')">CSV</button>
+              <button class="dropdown-item" (click)="setFileType('INI')">INI</button>
+            </div>
+        </div>
         <label class="btn btn-primary">
             Upload CSV or INI File <input type="file" id="file" (change)="submitFile($event.target.files)" hidden>
         </label>
@@ -65,4 +74,40 @@
             <button class="btn btn-dark" routerLink="/">Go Back</button>
         </div>
     </div>
+    <div class="list-group">
+        <div class="list-group-item flex-column align-items-start">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">DB Address Requirements</h5>
+          </div>
+          <ul class="list-group">
+            <li class="list-group-item">Cannot start with dot(.), underscore(_), or dash(-).</li>
+            <li class="list-group-item">Must contain 3 sections: address, port, and SID or service name.</li>
+            <li class="list-group-item">Address section can only contain alphanumeric characters, dot(.), underscore(_), and dash(-).</li>
+            <li class="list-group-item">Address must end with a colon (:).</li>
+            <li class="list-group-item">Port section can only contain numeric characters.</li>
+            <li class="list-group-item">Port must end with a colon(:) if using SID or slash(/) if using service name.</li>
+            <li class="list-group-item">SID/Service name section can only contain alphanumeric characters, dot(.), underscore(_), and dash(-).</li>
+            <li class="list-group-item">Maximum length is 100 characters.</li>
+            <li class="list-group-item">Valid examples:<br/>localhost:8080:xe<br/>rds-sample-db2.cg29ws2p7rim.us-west-2.rds.amazonaws.com:1521/ORCL</li>
+          </ul>
+        </div>
+        <div class="list-group-item flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">DB Username/Schema Requirements</h5>
+            </div>
+            <ul class="list-group">
+              <li class="list-group-item">Cannot start with dot(.) or underscore(_).</li>
+              <li class="list-group-item">Can can only contain alphanumeric characters, dot(.), and underscore(_).</li>
+              <li class="list-group-item">Maximum length is 25 characters.</li>
+            </ul>
+        </div>
+        <div class="list-group-item flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">Password Requirements</h5>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item">Maximum length is 25 characters.</li>
+            </ul>
+        </div>
+      </div>
 </div>

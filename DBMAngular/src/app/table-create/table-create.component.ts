@@ -12,6 +12,7 @@ import { MessageService } from '../message.service';
 })
 export class TableCreateComponent implements OnInit {
 
+  fileType = 'Auto';
   fileResult: any;
   uploadResult = '';
   credentialsGroup: FormGroup;
@@ -30,8 +31,12 @@ export class TableCreateComponent implements OnInit {
     });
   }
 
+  private setFileType(fileType: string) {
+    this.fileType = fileType;
+  }
+
   private submitFile(files: FileList) {
-    this.tableDataService.postFile(files.item(0)).subscribe(response => {
+    this.tableDataService.postFile(files.item(0), this.fileType).subscribe(response => {
       this.fileResult = response['resultMessage'];
       this.tableGroup = this.generateFormGroup();
     });
@@ -107,7 +112,6 @@ export class TableCreateComponent implements OnInit {
   }
 
   private updateFormGroup(column: string, newValue: string) {
-    console.log(newValue);
     this.tableGroup.value[column] = newValue;
   }
 }
