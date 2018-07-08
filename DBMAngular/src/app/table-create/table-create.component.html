@@ -1,4 +1,113 @@
-<div>
-    Create View
-<button routerLink="/">Go Back</button>
+<div class="container">
+    <div class="container my-3" *ngIf="fileResult">
+        {{tableGroup.value|json}}
+        <dexih-table [data]="fileResult[0].contents" [heading]="fileResult[0].name">
+        </dexih-table>
+        <div ngbDropdown *ngFor="let key of fileResult[0].headers"> 
+            <h6>{{key}}</h6>
+            <button class="btn btn-outline-primary" id="{{key}}" ngbDropdownToggle>{{tableGroup.value[key]}}</button>
+            <div ngbDropdownMenu aria-labelledby="key">
+                <button class="dropdown-item" (click)="updateFormGroup(key, 'Text')">Text</button>
+                <button class="dropdown-item" (click)="updateFormGroup(key, 'Number')">Number</button>
+                <button class="dropdown-item" (click)="updateFormGroup(key, 'Date')">Date</button>
+                <button class="dropdown-item" (click)="updateFormGroup(key, 'DTime')">Date and Time</button>
+            </div>                
+            <div [ngbCollapse]="tableGroup.value[key]!=='Number'">
+                Maximum Length of Digits <input type="number" [min]=1 [max]=31 [step]=1 [(ngModel)]="tableGroup.value[key+'var1']"/>
+                Number of Decimal Places <input type="number" [min]=0 [max]=31 [step]=1 [(ngModel)]="tableGroup.value[key+'var2']"/>
+            </div>
+            <div [ngbCollapse]="tableGroup.value[key]!=='Date'">
+                Date Format (M for Month, D for Day, Y for Year. Ex. MM-DD-YYYY)
+                <input type="text" pattern="[DMY/-]" [min]=6 [max]=11 [(ngModel)]="tableGroup.value[key+'var1']"/>
+            </div>
+            <div [ngbCollapse]="tableGroup.value[key]!=='DTime'">
+                DateTime Format (M for Month, D for Day, Y for Year, H for Hour, N for Minute, S for Second. 
+                Ex. MM-DD-YYYY HH:NN:SS)
+                <input type="text" pattern="[DHMNSY :/-]" [min]=12 [max]=2 [(ngModel)]="tableGroup.value[key+'var1']"/>
+            </div>
+        </div>
+    </div>
+    <div class="form-group" [formGroup]="credentialsGroup">
+        {{uploadResult}}
+        <div ngbDropdown>
+            <button class="btn btn-outline-primary" id="dropdownConfig" ngbDropdownToggle>Choose File Type</button>
+            <div ngbDropdownMenu aria-labelledby="dropdownConfig">
+              <button class="dropdown-item" (click)="setFileType('Auto')">Auto-Detect</button>
+              <button class="dropdown-item" (click)="setFileType('CSV')">CSV</button>
+              <button class="dropdown-item" (click)="setFileType('INI')">INI</button>
+            </div>
+        </div>
+        <label class="btn btn-primary">
+            Upload CSV or INI File <input type="file" id="file" (change)="submitFile($event.target.files)" hidden>
+        </label>
+        <div *ngIf="fileResult">
+            <div class="row">
+                <div class="input-group mb-3 col-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">DB Address</span>
+                    </div>
+                    <input type="text" class="form-control"
+                    formControlName="url"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-group mb-3 col-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">DB Username/Schema</span>
+                    </div>
+                    <input type="text" class="form-control"
+                    formControlName="username"/>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-group mb-3 col-5">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Password</span>
+                    </div>
+                    <input type="password" class="form-control"
+                    formControlName="password" />
+                </div>
+            </div>
+        </div>
+        <div>
+            <button *ngIf="fileResult" class="btn btn-success" (click)="confirmUpload()">Confirm Upload</button>
+            <button class="btn btn-dark" routerLink="/">Go Back</button>
+        </div>
+    </div>
+    <div class="list-group">
+        <div class="list-group-item flex-column align-items-start">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">DB Address Requirements</h5>
+          </div>
+          <ul class="list-group">
+            <li class="list-group-item">Cannot start with dot(.), underscore(_), or dash(-).</li>
+            <li class="list-group-item">Must contain 3 sections: address, port, and SID or service name.</li>
+            <li class="list-group-item">Address section can only contain alphanumeric characters, dot(.), underscore(_), and dash(-).</li>
+            <li class="list-group-item">Address must end with a colon (:).</li>
+            <li class="list-group-item">Port section can only contain numeric characters.</li>
+            <li class="list-group-item">Port must end with a colon(:) if using SID or slash(/) if using service name.</li>
+            <li class="list-group-item">SID/Service name section can only contain alphanumeric characters, dot(.), underscore(_), and dash(-).</li>
+            <li class="list-group-item">Maximum length is 100 characters.</li>
+            <li class="list-group-item">Valid examples:<br/>localhost:8080:xe<br/>rds-sample-db2.cg29ws2p7rim.us-west-2.rds.amazonaws.com:1521/ORCL</li>
+          </ul>
+        </div>
+        <div class="list-group-item flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">DB Username/Schema Requirements</h5>
+            </div>
+            <ul class="list-group">
+              <li class="list-group-item">Cannot start with dot(.) or underscore(_).</li>
+              <li class="list-group-item">Can can only contain alphanumeric characters, dot(.), and underscore(_).</li>
+              <li class="list-group-item">Maximum length is 25 characters.</li>
+            </ul>
+        </div>
+        <div class="list-group-item flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">Password Requirements</h5>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item">Maximum length is 25 characters.</li>
+            </ul>
+        </div>
+      </div>
 </div>

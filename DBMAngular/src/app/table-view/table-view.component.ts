@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { NgbTabChangeEvent } from '@ng-bootstrap/ng-bootstrap';
-import { faChevronLeft } from '@fortawesome/fontawesome-free-solid';
-import { faClipboard } from '@fortawesome/fontawesome-free-regular';
-import fontawesome from '@fortawesome/fontawesome';
 
 import { TableDataService } from '../table-data.service';
 
@@ -22,7 +19,6 @@ export class TableViewComponent implements OnInit {
 
   ngOnInit() {
     this.getTableList();
-    fontawesome.library.add(faChevronLeft, faClipboard);
   }
 
   getTableList() {

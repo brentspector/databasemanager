@@ -26,7 +26,7 @@
                     <dexih-table [data]="key.contents" [heading]="key.name" *ngSwitchCase="i">
                     </dexih-table>
                 </ng-template>  
-                <app-table-edit></app-table-edit>  
+                <app-table-edit *ngIf="tableTest[0].contents"></app-table-edit>  
             </div>
         </div>
     </div>
