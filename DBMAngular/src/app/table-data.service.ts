@@ -65,6 +65,28 @@ export class TableDataService {
     this.showTable = table;
   }
 
+  addNewRecord(record: Object) {
+    return of(this.tableData[this.showTable].contents.push(record)).pipe(catchError(this.handleError('Add record', [])));
+  }
+
+  addMassNewRecords(files: FileList, uploadType: string) {
+    return of(this.appendMultipleRows(this.tableData[this.showTable].contents)).pipe(catchError(this.handleError('Add mass records', [])));
+  }
+
+  private appendMultipleRows(newSet: Object) {
+    const tempArray = this.tableData[this.showTable].contents;
+    for (const key in newSet) {
+      if (newSet.hasOwnProperty(key)) {
+        tempArray.push(newSet[key]);
+      }
+    }
+    this.tableData[this.showTable].contents = tempArray;
+  }
+
+  addNewColumn(columnObject: Object) {
+    return of(this.uploadStatus).pipe(catchError(this.handleError('Add new column', [])));
+  }
+
   private handleError<T> (operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       console.error(error);

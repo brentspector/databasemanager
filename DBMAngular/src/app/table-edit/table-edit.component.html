@@ -1,6 +1,6 @@
 <ng-template #content let-c="close" let-d="dismiss">
     <div class="modal-header">
-      <h4 class="modal-title">Modal title</h4>
+      <h4 class="modal-title">Add Record</h4>
       <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -21,4 +21,62 @@
     </div>
   </ng-template>
   
-  <button class="btn btn-outline-primary" (click)="open(content)">Add Row</button>
+  <ng-template #columnPrompt let-c="close" let-d="dismiss">
+      <div class="modal-header">
+        <h4 class="modal-title">Add Column</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitNewColumn()" [formGroup]="columnGroup">
+            <div class="form-group"> 
+                <label for="columnName">Column Name</label>
+                <input type="text" name="columnName" [formControlName]="'columnName'"/>
+                <div ngbDropdown> 
+                    <h6>Column Type</h6>
+                    <button class="btn btn-outline-primary" id="columnType" ngbDropdownToggle>{{columnGroup.value['columnType']}}</button>
+                    <div ngbDropdownMenu aria-labelledby="columnType">
+                        <button class="dropdown-item" (click)="updateFormGroup('columnType', 'Text')">Text</button>
+                        <button class="dropdown-item" (click)="updateFormGroup('columnType', 'Number')">Number</button>
+                        <button class="dropdown-item" (click)="updateFormGroup('columnType', 'Date')">Date</button>
+                        <button class="dropdown-item" (click)="updateFormGroup('columnType', 'DTime')">Date and Time</button>
+                    </div>                
+                    <div [ngbCollapse]="columnGroup.value['columnType']!=='Number'">
+                        Maximum Length of Digits <input type="number" [min]=1 [max]=31 [step]=1 [formControlName]="'columnTypevar1'"/>
+                        Number of Decimal Places <input type="number" [min]=0 [max]=31 [step]=1 [formControlName]="'columnTypevar2'"/>
+                    </div>
+                    <div [ngbCollapse]="columnGroup.value['columnType']!=='Date'">
+                        Date Format (M for Month, D for Day, Y for Year. Ex. MM-DD-YYYY)
+                        <input type="text" pattern="[DMY/-]" [min]=6 [max]=11 [formControlName]="'columnTypevar1'"/>
+                    </div>
+                    <div [ngbCollapse]="columnGroup.value['columnType']!=='DTime'">
+                        DateTime Format (M for Month, D for Day, Y for Year, H for Hour, N for Minute, S for Second. 
+                        Ex. MM-DD-YYYY HH:NN:SS)
+                        <input type="text" pattern="[DHMNSY :/-]" [min]=12 [max]=2 [formControlName]="'columnTypevar1'"/>
+                    </div>
+                </div>
+                
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" (click)="submitNewColumn()">Submit</button>
+        <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
+      </div>
+    </ng-template>
+
+  <div>
+    <label class="btn btn-outline-primary">
+      Add Row<button class="btn btn-outline-primary" (click)="open(content)" hidden></button>
+    </label>
+    <label class="btn btn-outline-primary">
+      Only Add New From File <input type="file" id="file" (change)="submitFile($event.target.files, 'add')" hidden>
+    </label>
+    <label class="btn btn-outline-primary">
+      Add or Update From File <input type="file" id="file" (change)="submitFile($event.target.files, 'update')" hidden>
+    </label>
+    <label class="btn btn-outline-primary">
+      Add Column<button class="btn btn-outline-primary" (click)="open(columnPrompt)" hidden></button>
+    </label>
+  </div>
