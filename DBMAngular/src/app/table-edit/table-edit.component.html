@@ -66,7 +66,54 @@
       </div>
     </ng-template>
 
-  <div>
+    <ng-template #editRecord let-c="close" let-d="dismiss">
+      <div class="modal-header">
+        <h4 class="modal-title">Edit Record</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="submitEditRecord()" [formGroup]="modalGroup">
+            <div class="form-group">
+                <ng-template ngFor let-column [ngForOf]="modalFields"> 
+                  <label for="{{column}}">{{column}}</label>
+                  <input type="text" name="{{column}}" [formControlName]="column"/>
+                </ng-template>
+                <label for="deleteCheck" *ngIf="modalGroup">Delete This Record?</label>
+                <input type="checkbox" name="deleteCheck" *ngIf= "modalGroup" [formControlName]="'deleteCheck'"/>
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" (click)="submitEditRecord()">Submit</button>
+        <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
+      </div>
+    </ng-template>
+
+    <ng-template #deleteData let-c="close" let-d="dismiss">
+      <div class="modal-header">
+        <h4 class="modal-title">Delete Data From Column In All Records</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <div ngbDropdown> 
+              <h6>Select a Column</h6>
+              <button class="btn btn-outline-primary" id="columnSelection" ngbDropdownToggle>{{columnChoice}}</button>
+              <div ngbDropdownMenu aria-labelledby="columnSelection">
+                  <button class="dropdown-item" *ngFor="let header of modalFields" (click)="updateColumnChoice(header)">{{header}}</button>
+              </div> 
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" (click)="submitDeleteColumnData()">Submit</button>
+        <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
+      </div>
+    </ng-template>
+
+    <div>
     <label class="btn btn-outline-primary">
       Add Row<button class="btn btn-outline-primary" (click)="open(content)" hidden></button>
     </label>
@@ -79,4 +126,7 @@
     <label class="btn btn-outline-primary">
       Add Column<button class="btn btn-outline-primary" (click)="open(columnPrompt)" hidden></button>
     </label>
+    <label class="btn btn-outline-primary">
+        Delete Column Data<button class="btn btn-outline-primary" (click)="open(deleteData)" hidden></button>
+      </label>
   </div>

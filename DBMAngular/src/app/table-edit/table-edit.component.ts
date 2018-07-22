@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { TableDataService } from '../table-data.service';
 
@@ -11,9 +11,13 @@ import { TableDataService } from '../table-data.service';
 })
 export class TableEditComponent implements OnInit {
 
+  @ViewChild('editRecord')
+  editRecord: ElementRef;
+  modalRef: NgbModalRef;
   modalGroup: FormGroup;
   modalFields: any[];
   columnGroup: FormGroup;
+  columnChoice: string;
 
   constructor(private modalService: NgbModal, private tableDataService: TableDataService) {}
 
@@ -24,14 +28,15 @@ export class TableEditComponent implements OnInit {
       columnTypevar1: new FormControl(''),
       columnTypevar2: new FormControl('')
    });
+   this.columnChoice = 'Select...';
   }
 
-  open(content) {
+  private open(content) {
     this.modalGroup = this.generateFormGroup();
-    this.modalService.open(content).result.then((result) => {});
+    this.modalRef = this.modalService.open(content);
   }
 
-  generateFormGroup() {
+  private generateFormGroup() {
     const group: any = {};
 
     this.tableDataService.getHeaders().subscribe(data => {
@@ -40,7 +45,7 @@ export class TableEditComponent implements OnInit {
         group[column] = new FormControl('');
       });
     });
-
+    group['deleteCheck'] = new FormControl(false);
     return new FormGroup(group);
   }
 
@@ -50,13 +55,36 @@ export class TableEditComponent implements OnInit {
 
   private submitNewRecord() {
     this.tableDataService.addNewRecord(this.modalGroup.value);
+    this.modalRef.close();
   }
 
   private submitFile(files: FileList, uploadType: string) {
     this.tableDataService.addMassNewRecords(files, uploadType);
+    this.modalRef.close();
   }
 
   private submitNewColumn() {
     this.tableDataService.addNewColumn(this.columnGroup.value);
+    this.modalRef.close();
+  }
+
+  openRecordEdit(record) {
+    this.modalGroup = this.generateFormGroup();
+    this.modalGroup.patchValue(record);
+    this.modalRef = this.modalService.open(this.editRecord);
+  }
+
+  private submitEditRecord() {
+    this.tableDataService.updateRecord(this.modalGroup.value);
+    this.modalRef.close();
+  }
+
+  private updateColumnChoice(columnChoice) {
+    this.columnChoice = columnChoice;
+  }
+
+  private submitDeleteColumnData() {
+    this.tableDataService.deleteColumnData(this.columnChoice);
+    this.modalRef.close();
   }
 }

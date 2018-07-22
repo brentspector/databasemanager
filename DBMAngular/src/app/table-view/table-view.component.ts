@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { NgbTabChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 
 import { TableDataService } from '../table-data.service';
+import { TableEditComponent } from '../table-edit/table-edit.component';
 
 @Component({
   selector: 'app-table-view',
@@ -10,6 +11,8 @@ import { TableDataService } from '../table-data.service';
   styleUrls: ['./table-view.component.css']
 })
 export class TableViewComponent implements OnInit {
+  @ViewChild('editModule')
+  editModule: TableEditComponent;
   tableChoice: FormGroup;
   private tableList: any[];
   private tableTest = [{name: '', contents: ''}];
@@ -50,5 +53,8 @@ export class TableViewComponent implements OnInit {
 
   private getShowTable(): string {
     return this.tableDataService.getShowTable();
+  }
+  private openRecordEdit(record) {
+    this.editModule.openRecordEdit(record);
   }
 }

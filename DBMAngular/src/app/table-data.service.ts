@@ -87,6 +87,25 @@ export class TableDataService {
     return of(this.uploadStatus).pipe(catchError(this.handleError('Add new column', [])));
   }
 
+  updateRecord(record: Object) {
+    const tempObj = {};
+    for (const key in this.tableData[this.showTable].contents[0]) {
+      if (record['deleteCheck'] === true) {
+        tempObj[key] = '';
+      } else {
+        tempObj[key] = record[key];
+      }
+    }
+    this.tableData[this.showTable].contents[0] = tempObj;
+
+    return of(this.tableData[this.showTable].contents).pipe(catchError(this.handleError('Update record', [])));
+  }
+
+  deleteColumnData(columnChoice) {
+    console.log(columnChoice);
+    return of(this.uploadStatus).pipe(catchError(this.handleError('Delete Column Data', [])));
+  }
+
   private handleError<T> (operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
       console.error(error);
