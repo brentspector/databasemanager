@@ -1,0 +1,7 @@
+<p>This the Advanced SQL Editor. It allows you to submit lines of SQL, similar to a
+  SQL Application Development environment. </p>
+  <form (ngSubmit)="submitSQL(textField.value)">
+    <textarea #textField rows="4" cols="50" autofocus></textarea>
+    <input type="submit"/>
+  </form>
+  <button class="btn btn-dark" routerLink="/view">Go Back</button>

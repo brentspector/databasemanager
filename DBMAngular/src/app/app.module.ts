@@ -13,6 +13,7 @@ import { HomepageComponent } from './homepage/homepage.component';
 import { TableEditComponent } from './table-edit/table-edit.component';
 import { AppHeaderComponent } from './app-header/app-header.component';
 import { MessengerComponent } from './messenger/messenger.component';
+import { TableSqlComponent } from './table-sql/table-sql.component';
 
 @NgModule({
   declarations: [
@@ -22,7 +23,8 @@ import { MessengerComponent } from './messenger/messenger.component';
     HomepageComponent,
     TableEditComponent,
     AppHeaderComponent,
-    MessengerComponent
+    MessengerComponent,
+    TableSqlComponent
   ],
   imports: [
     BrowserModule, DexihTableModule, DndModule.forRoot(), NgbModule.forRoot(),

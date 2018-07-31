@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
@@ -11,13 +11,18 @@ import { TableDataService } from '../table-data.service';
 })
 export class TableEditComponent implements OnInit {
 
+  @Output()
+  refresh: EventEmitter<any> = new EventEmitter();
   @ViewChild('editRecord')
   editRecord: ElementRef;
   modalRef: NgbModalRef;
   modalGroup: FormGroup;
   modalFields: any[];
+  tableNames: any[];
   columnGroup: FormGroup;
-  columnChoice: string;
+  columnModifyGroup: FormGroup;
+  fileChoice: string;
+  tableChoice: string;
 
   constructor(private modalService: NgbModal, private tableDataService: TableDataService) {}
 
@@ -28,7 +33,16 @@ export class TableEditComponent implements OnInit {
       columnTypevar1: new FormControl(''),
       columnTypevar2: new FormControl('')
    });
-   this.columnChoice = 'Select...';
+   this.columnModifyGroup = new FormGroup({
+     columnName: new FormControl('Select...'),
+     columnData: new FormControl(''),
+     columnAction: new FormControl()
+   });
+   this.tableDataService.getList().subscribe(data => {
+     this.tableNames = data;
+  });
+   this.fileChoice = 'Select...';
+   this.tableChoice = 'Select...';
   }
 
   private open(content) {
@@ -58,8 +72,8 @@ export class TableEditComponent implements OnInit {
     this.modalRef.close();
   }
 
-  private submitFile(files: FileList, uploadType: string) {
-    this.tableDataService.addMassNewRecords(files, uploadType);
+  private submitFile(files: FileList) {
+    this.tableDataService.massModifyRecords(files, this.fileChoice);
     this.modalRef.close();
   }
 
@@ -80,11 +94,24 @@ export class TableEditComponent implements OnInit {
   }
 
   private updateColumnChoice(columnChoice) {
-    this.columnChoice = columnChoice;
+    this.columnModifyGroup.value['columnName'] = columnChoice;
   }
 
-  private submitDeleteColumnData() {
-    this.tableDataService.deleteColumnData(this.columnChoice);
+  private updateFileChoice(fileChoice) {
+    this.fileChoice = fileChoice;
+  }
+
+  private updateTableChoice(tableChoice) {
+    this.tableChoice = tableChoice;
+  }
+
+  private submitModifyColumnData() {
+    this.tableDataService.modifyColumnData(this.columnModifyGroup.value);
+    this.modalRef.close();
+  }
+
+  private submitTableDeletion() {
+    this.refresh.emit(this.tableChoice);
     this.modalRef.close();
   }
 }

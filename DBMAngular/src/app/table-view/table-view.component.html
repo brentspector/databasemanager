@@ -9,6 +9,7 @@
             <div class="form-group row">
                 <button type="submit" [disabled]="!tableChoice.valid">Submit</button>
                 <button routerLink="/">Back</button>
+                <button routerLink="/sql">SQL Editor</button>
             </div>
         </form>
     </div>
@@ -26,7 +27,7 @@
                     <dexih-table [data]="key.contents" [heading]="key.name" (rowClick)="openRecordEdit($event)" *ngSwitchCase="i">
                     </dexih-table>
                 </ng-template>  
-                <app-table-edit #editModule *ngIf="tableTest[0].contents"></app-table-edit>  
+                <app-table-edit #editModule *ngIf="tableTest[0].contents" (refresh)="deleteTable($event)"></app-table-edit>  
             </div>
         </div>
     </div>

@@ -4,6 +4,7 @@ import { NgbTabChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 
 import { TableDataService } from '../table-data.service';
 import { TableEditComponent } from '../table-edit/table-edit.component';
+import { Router } from '../../../node_modules/@angular/router';
 
 @Component({
   selector: 'app-table-view',
@@ -17,7 +18,7 @@ export class TableViewComponent implements OnInit {
   private tableList: any[];
   private tableTest = [{name: '', contents: ''}];
 
-  constructor(private tableDataService: TableDataService) {
+  constructor(private tableDataService: TableDataService, private router: Router) {
    }
 
   ngOnInit() {
@@ -45,6 +46,14 @@ export class TableViewComponent implements OnInit {
     });
 
     return new FormGroup(group);
+  }
+
+  deleteTable(table: Object) {
+    this.tableDataService.deleteTable(table.toString()).subscribe(result => {
+      this.tableTest = [{name: '', contents: ''}];
+      this.tableChoice = new FormGroup({});
+      this.getTableList();
+    });
   }
 
   private toggleShow($event: NgbTabChangeEvent) {

@@ -1,39 +1,39 @@
 <ng-template #content let-c="close" let-d="dismiss">
     <div class="modal-header">
-      <h4 class="modal-title">Add Record</h4>
-      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
+        <h4 class="modal-title">Add Record</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
     <div class="modal-body">
-      <form (ngSubmit)="submitNewRecord()" [formGroup]="modalGroup">
-          <div class="form-group">
-              <ng-template ngFor let-column [ngForOf]="modalFields"> 
-                <label for="{{column}}">{{column}}</label>
-                <input type="text" name="{{column}}" [formControlName]="column"/>
-              </ng-template>
-          </div>
-      </form>
+        <form (ngSubmit)="submitNewRecord()" [formGroup]="modalGroup">
+            <div class="form-group">
+                <ng-template ngFor let-column [ngForOf]="modalFields">
+                    <label for="{{column}}">{{column}}</label>
+                    <input type="text" name="{{column}}" [formControlName]="column" />
+                </ng-template>
+            </div>
+        </form>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-outline-primary" (click)="submitNewRecord()">Submit</button>
-      <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
+        <button type="button" class="btn btn-outline-primary" (click)="submitNewRecord()">Submit</button>
+        <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
     </div>
-  </ng-template>
-  
-  <ng-template #columnPrompt let-c="close" let-d="dismiss">
-      <div class="modal-header">
+</ng-template>
+
+<ng-template #columnPrompt let-c="close" let-d="dismiss">
+    <div class="modal-header">
         <h4 class="modal-title">Add Column</h4>
         <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-          <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times;</span>
         </button>
-      </div>
-      <div class="modal-body">
+    </div>
+    <div class="modal-body">
         <form (ngSubmit)="submitNewColumn()" [formGroup]="columnGroup">
-            <div class="form-group"> 
+            <div class="form-group">
                 <label for="columnName">Column Name</label>
-                <input type="text" name="columnName" [formControlName]="'columnName'"/>
-                <div ngbDropdown> 
+                <input type="text" name="columnName" [formControlName]="'columnName'" />
+                <div ngbDropdown>
                     <h6>Column Type</h6>
                     <button class="btn btn-outline-primary" id="columnType" ngbDropdownToggle>{{columnGroup.value['columnType']}}</button>
                     <div ngbDropdownMenu aria-labelledby="columnType">
@@ -41,92 +41,171 @@
                         <button class="dropdown-item" (click)="updateFormGroup('columnType', 'Number')">Number</button>
                         <button class="dropdown-item" (click)="updateFormGroup('columnType', 'Date')">Date</button>
                         <button class="dropdown-item" (click)="updateFormGroup('columnType', 'DTime')">Date and Time</button>
-                    </div>                
+                    </div>
                     <div [ngbCollapse]="columnGroup.value['columnType']!=='Number'">
-                        Maximum Length of Digits <input type="number" [min]=1 [max]=31 [step]=1 [formControlName]="'columnTypevar1'"/>
-                        Number of Decimal Places <input type="number" [min]=0 [max]=31 [step]=1 [formControlName]="'columnTypevar2'"/>
+                        Maximum Length of Digits
+                        <input type="number" [min]=1 [max]=31 [step]=1 [formControlName]="'columnTypevar1'" />Number of Decimal Places
+                        <input type="number" [min]=0 [max]=31 [step]=1 [formControlName]="'columnTypevar2'" />
                     </div>
                     <div [ngbCollapse]="columnGroup.value['columnType']!=='Date'">
                         Date Format (M for Month, D for Day, Y for Year. Ex. MM-DD-YYYY)
-                        <input type="text" pattern="[DMY/-]" [min]=6 [max]=11 [formControlName]="'columnTypevar1'"/>
+                        <input type="text" pattern="[DMY/-]" [min]=6 [max]=11 [formControlName]="'columnTypevar1'" />
                     </div>
                     <div [ngbCollapse]="columnGroup.value['columnType']!=='DTime'">
-                        DateTime Format (M for Month, D for Day, Y for Year, H for Hour, N for Minute, S for Second. 
-                        Ex. MM-DD-YYYY HH:NN:SS)
-                        <input type="text" pattern="[DHMNSY :/-]" [min]=12 [max]=2 [formControlName]="'columnTypevar1'"/>
+                        DateTime Format (M for Month, D for Day, Y for Year, H for Hour, N for Minute, S for Second. Ex. MM-DD-YYYY HH:NN:SS)
+                        <input type="text" pattern="[DHMNSY :/-]" [min]=12 [max]=2 [formControlName]="'columnTypevar1'" />
                     </div>
                 </div>
-                
+
             </div>
         </form>
-      </div>
-      <div class="modal-footer">
+    </div>
+    <div class="modal-footer">
         <button type="button" class="btn btn-outline-primary" (click)="submitNewColumn()">Submit</button>
         <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
-      </div>
-    </ng-template>
+    </div>
+</ng-template>
 
-    <ng-template #editRecord let-c="close" let-d="dismiss">
-      <div class="modal-header">
+<ng-template #editRecord let-c="close" let-d="dismiss">
+    <div class="modal-header">
         <h4 class="modal-title">Edit Record</h4>
         <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-          <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times;</span>
         </button>
-      </div>
-      <div class="modal-body">
+    </div>
+    <div class="modal-body">
         <form (ngSubmit)="submitEditRecord()" [formGroup]="modalGroup">
             <div class="form-group">
-                <ng-template ngFor let-column [ngForOf]="modalFields"> 
-                  <label for="{{column}}">{{column}}</label>
-                  <input type="text" name="{{column}}" [formControlName]="column"/>
+                <ng-template ngFor let-column [ngForOf]="modalFields">
+                    <label for="{{column}}">{{column}}</label>
+                    <input type="text" name="{{column}}" [formControlName]="column" />
                 </ng-template>
                 <label for="deleteCheck" *ngIf="modalGroup">Delete This Record?</label>
-                <input type="checkbox" name="deleteCheck" *ngIf= "modalGroup" [formControlName]="'deleteCheck'"/>
+                <input type="checkbox" name="deleteCheck" *ngIf="modalGroup" [formControlName]="'deleteCheck'" />
             </div>
         </form>
-      </div>
-      <div class="modal-footer">
+    </div>
+    <div class="modal-footer">
         <button type="button" class="btn btn-outline-primary" (click)="submitEditRecord()">Submit</button>
         <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
-      </div>
-    </ng-template>
+    </div>
+</ng-template>
 
-    <ng-template #deleteData let-c="close" let-d="dismiss">
-      <div class="modal-header">
-        <h4 class="modal-title">Delete Data From Column In All Records</h4>
+<ng-template #filePrompt let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Upload File and Modify Records</h4>
         <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
-          <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times;</span>
         </button>
-      </div>
-      <div class="modal-body">
-          <div ngbDropdown> 
-              <h6>Select a Column</h6>
-              <button class="btn btn-outline-primary" id="columnSelection" ngbDropdownToggle>{{columnChoice}}</button>
-              <div ngbDropdownMenu aria-labelledby="columnSelection">
-                  <button class="dropdown-item" *ngFor="let header of modalFields" (click)="updateColumnChoice(header)">{{header}}</button>
-              </div> 
-          </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-primary" (click)="submitDeleteColumnData()">Submit</button>
+    </div>
+    <div class="modal-body">
+        <input #file type="file" id="file">
+        <div ngbDropdown>
+            <h6>Select Modification</h6>
+            <button class="btn btn-outline-primary" id="fileSelection" ngbDropdownToggle>{{fileChoice}}</button>
+            <div ngbDropdownMenu aria-labelledby="fileSelection">
+                <button class="dropdown-item" (click)="updateFileChoice('add')">Add Only</button>
+                <button class="dropdown-item" (click)="updateFileChoice('update')">Add or Update</button>
+                <button class="dropdown-item" (click)="updateFileChoice('delete')">Delete</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" (click)="submitFile(file.files)">Submit</button>
         <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
-      </div>
-    </ng-template>
+    </div>
+</ng-template>
 
-    <div>
+<ng-template #deleteTable let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Delete Table</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div ngbDropdown>
+            <h6>Select Table to Delete</h6>
+            <button class="btn btn-outline-primary" id="tableSelection" ngbDropdownToggle>{{tableChoice}}</button>
+            <div ngbDropdownMenu aria-labelledby="tableSelection">
+                <button class="dropdown-item" *ngFor="let table of tableNames" (click)="updateTableChoice(table)">{{table}}</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" (click)="submitTableDeletion()">Submit</button>
+        <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>
+
+<ng-template #modifyColumnData let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Modify Column</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="columnModifyGroup">
+            <div ngbDropdown>
+                <h6>Select a Column</h6>
+                <button class="btn btn-outline-primary" id="columnSelection" ngbDropdownToggle>{{columnModifyGroup.value['columnName']}}</button>
+                <div ngbDropdownMenu aria-labelledby="columnSelection">
+                    <button class="dropdown-item" *ngFor="let header of modalFields" (click)="updateColumnChoice(header)">{{header}}</button>
+                </div>
+            </div>
+            <div>
+                <label>
+                    <input type="radio" value="add" formControlName="columnAction">Fill Empty Column Data
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="radio" value="replace" formControlName="columnAction">Replace Column Data
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="radio" value="deleteData" formControlName="columnAction">Delete Column Data
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="radio" value="deleteColumn" formControlName="columnAction">Delete Column from Table
+                </label>
+            </div> 
+            <div *ngIf="columnModifyGroup.value['columnAction']=='add'"> 
+                <label>
+                    Value<input type="text" formControlName="columnData"/>
+                </label>
+            </div>  
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" (click)="submitModifyColumnData()">Submit</button>
+        <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
+    </div>
+</ng-template>
+
+<div>
     <label class="btn btn-outline-primary">
-      Add Row<button class="btn btn-outline-primary" (click)="open(content)" hidden></button>
+        Add Row
+        <button class="btn btn-outline-primary" (click)="open(content)" hidden></button>
     </label>
     <label class="btn btn-outline-primary">
-      Only Add New From File <input type="file" id="file" (change)="submitFile($event.target.files, 'add')" hidden>
+        Modify Records from File
+        <button class="btn btn-outline-primary" (click)="open(filePrompt)" hidden></button>
     </label>
     <label class="btn btn-outline-primary">
-      Add or Update From File <input type="file" id="file" (change)="submitFile($event.target.files, 'update')" hidden>
+        Add Column
+        <button class="btn btn-outline-primary" (click)="open(columnPrompt)" hidden></button>
     </label>
     <label class="btn btn-outline-primary">
-      Add Column<button class="btn btn-outline-primary" (click)="open(columnPrompt)" hidden></button>
+        Modify Column Data
+        <button class="btn btn-outline-primary" (click)="open(modifyColumnData)" hidden></button>
     </label>
     <label class="btn btn-outline-primary">
-        Delete Column Data<button class="btn btn-outline-primary" (click)="open(deleteData)" hidden></button>
-      </label>
-  </div>
+        Delete Table
+        <button class="btn btn-outline-primary" (click)="open(deleteTable)" hidden></button>
+    </label>
+</div>

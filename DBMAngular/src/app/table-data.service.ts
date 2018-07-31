@@ -69,8 +69,9 @@ export class TableDataService {
     return of(this.tableData[this.showTable].contents.push(record)).pipe(catchError(this.handleError('Add record', [])));
   }
 
-  addMassNewRecords(files: FileList, uploadType: string) {
-    return of(this.appendMultipleRows(this.tableData[this.showTable].contents)).pipe(catchError(this.handleError('Add mass records', [])));
+  massModifyRecords(files: FileList, uploadType: string) {
+    return of(this.appendMultipleRows(this.tableData[this.showTable].contents)).
+    pipe(catchError(this.handleError('Mass modify records', [])));
   }
 
   private appendMultipleRows(newSet: Object) {
@@ -101,9 +102,16 @@ export class TableDataService {
     return of(this.tableData[this.showTable].contents).pipe(catchError(this.handleError('Update record', [])));
   }
 
-  deleteColumnData(columnChoice) {
-    console.log(columnChoice);
-    return of(this.uploadStatus).pipe(catchError(this.handleError('Delete Column Data', [])));
+  modifyColumnData(record: Object) {
+    return of(this.uploadStatus).pipe(catchError(this.handleError('Modify Column Data', [])));
+  }
+
+  deleteTable(table: string) {
+    return of(this.tableList[this.tableList.indexOf(table)] = ' ').pipe(catchError(this.handleError('Delete table', [])));
+  }
+
+  submitSQL(sql: string) {
+    return of(this.uploadStatus).pipe(catchError(this.handleError('Submit SQL', [])));
   }
 
   private handleError<T> (operation = 'operation', result?: T) {
