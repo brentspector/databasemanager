@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { NgbTabChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 
 import { TableDataService } from '../table-data.service';
+import { TableEditComponent } from '../table-edit/table-edit.component';
+import { Router } from '../../../node_modules/@angular/router';
 
 @Component({
   selector: 'app-table-view',
@@ -10,11 +12,13 @@ import { TableDataService } from '../table-data.service';
   styleUrls: ['./table-view.component.css']
 })
 export class TableViewComponent implements OnInit {
+  @ViewChild('editModule')
+  editModule: TableEditComponent;
   tableChoice: FormGroup;
   private tableList: any[];
   private tableTest = [{name: '', contents: ''}];
 
-  constructor(private tableDataService: TableDataService) {
+  constructor(private tableDataService: TableDataService, private router: Router) {
    }
 
   ngOnInit() {
@@ -44,11 +48,22 @@ export class TableViewComponent implements OnInit {
     return new FormGroup(group);
   }
 
+  deleteTable(table: Object) {
+    this.tableDataService.deleteTable(table.toString()).subscribe(result => {
+      this.tableTest = [{name: '', contents: ''}];
+      this.tableChoice = new FormGroup({});
+      this.getTableList();
+    });
+  }
+
   private toggleShow($event: NgbTabChangeEvent) {
     this.tableDataService.setShowTable($event.nextId);
   }
 
   private getShowTable(): string {
     return this.tableDataService.getShowTable();
+  }
+  private openRecordEdit(record) {
+    this.editModule.openRecordEdit(record);
   }
 }
