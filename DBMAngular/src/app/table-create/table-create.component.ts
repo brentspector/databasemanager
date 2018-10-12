@@ -92,6 +92,7 @@ export class TableCreateComponent implements OnInit {
     }
 
     if (formValid) {
+      console.log(this.tableGroup);
       this.tableDataService.confirmFile().subscribe(response => this.uploadResult = response['resultMessage']);
     }
   }
