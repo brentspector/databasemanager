@@ -1,0 +1,7 @@
+[1]
+Name=Joe
+Status=OK
+Location=San Jose
+[2]
+Name=Greg
+Status=Normal

@@ -1,0 +1,3 @@
+Clan,Carte,Nombre,Prix Unitaire,Prix Total
+All Stars,Aamir,1,28000,28000
+All Stars,Agustino,1,750,750
