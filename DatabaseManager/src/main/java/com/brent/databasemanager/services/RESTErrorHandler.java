@@ -19,6 +19,7 @@ import com.brent.databasemanager.pojo.FileParseException;
 import com.brent.databasemanager.pojo.ObjectStorageException;
 import com.brent.databasemanager.pojo.STTFException;
 import com.brent.databasemanager.pojo.TTSCException;
+import com.brent.databasemanager.pojo.TableReadException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -71,6 +72,11 @@ public class RESTErrorHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleTTSCException(TTSCException ex) {
 		return buildResponseEntity(new APIResponse(HttpStatus.NOT_FOUND, ex.getMessage()));
 	} //end handleTTSCException 
+	
+	@ExceptionHandler(TableReadException.class)
+	protected ResponseEntity<Object> handleTableReadException(TableReadException ex) {
+		return buildResponseEntity(new APIResponse(HttpStatus.BAD_REQUEST, ex.getMessage()));
+	} //end handleTableReadException
 	
 	@ExceptionHandler(Throwable.class)
 	protected ResponseEntity<Object> handleThrowable(Throwable ex) {

@@ -2,12 +2,14 @@ package com.brent.databasemanager.services;
 
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
-import java.util.ArrayList;
+import java.sql.SQLRecoverableException;
+import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -33,11 +35,23 @@ public class ConnectionManager {
 	    return dataSourceBuilder.build();   
 	} //end getDataSource
 
-	public void executeString(String sql) {
+	public void executeString(String sql) throws SQLException {
 		userJdbcTemplate.execute(sql);		
 	} //end executeString
 
-	public void executePreparedStatement(String sql, Object[] sqlValues) {
+	public void executePreparedStatement(String sql, Object[] sqlValues) throws SQLException {
 		userJdbcTemplate.update(sql, sqlValues);
 	} //end executePreparedStatement
+	
+	public List<Map<String, Object>> queryMultipleRows(String sql, Object[] sqlValues) throws SQLException {
+		try {
+			return userJdbcTemplate.queryForList(sql, sqlValues);
+		} catch (CannotGetJdbcConnectionException e) {
+			if (e.contains(SQLRecoverableException.class)) {
+				throw (SQLRecoverableException) e.getCause();
+			} //end if
+			
+			throw (SQLException) e.getCause();
+		} //end try-catch block
+	} //end queryPreparedStatement
 } //end ConnectionVerifier class
