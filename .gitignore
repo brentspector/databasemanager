@@ -4,6 +4,9 @@
 # Log file
 *.log
 
+# Serizalized Object
+*.ser
+
 # BlueJ files
 *.ctxt
 
@@ -29,3 +32,9 @@ package-lock.json
 
 /.metadata/
 /.recommenders/
+
+# Java/Spring/Maven
+*/.gitignore
+*/.mvn/
+RemoteSystemsTempFiles*
+Servers*

@@ -192,7 +192,7 @@ public class TableToSQLConverter {
 	@SuppressWarnings("unchecked")
 	private void insertContents(ArrayList<Map<String, String>> contents, String tableName, 
 			Map<String, String> columnTypes, Map<String, String> dateFormats, 
-			Map<String, String> timestampFormats, String sql, boolean row)
+			Map<String, String> timestampFormats, String sql, boolean row) throws SQLException
 	{
 		ArrayList<Object> sqlValues = new ArrayList<Object>();
 		StringBuilder sqlColumns = new StringBuilder(" (");
