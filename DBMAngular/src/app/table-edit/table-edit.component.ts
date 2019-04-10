@@ -59,6 +59,7 @@ export class TableEditComponent implements OnInit {
         group[column] = new FormControl('');
       });
     });
+    group['primaryKey'] = new FormControl('');
     group['deleteCheck'] = new FormControl(false);
     return new FormGroup(group);
   }
@@ -86,6 +87,10 @@ export class TableEditComponent implements OnInit {
     this.modalGroup = this.generateFormGroup();
     this.modalGroup.patchValue(record);
     this.modalRef = this.modalService.open(this.editRecord);
+  }
+
+  private updatePrimaryKey(columnChoice) {
+    this.modalGroup.value['primaryKey'] = columnChoice;
   }
 
   private submitEditRecord() {

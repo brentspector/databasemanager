@@ -77,8 +77,12 @@
         <form (ngSubmit)="submitEditRecord()" [formGroup]="modalGroup">
             <div class="form-group">
                 <ng-template ngFor let-column [ngForOf]="modalFields">
-                    <label for="{{column}}">{{column}}</label>
-                    <input type="text" name="{{column}}" [formControlName]="column" />
+                    <div>
+                        <label for="{{column}}">{{column}}</label>
+                        <input type="text" name="{{column}}" [formControlName]="column"/>
+                        <label>Key</label>
+                        <input type="radio" name="primaryKeyRadio" (click)="updatePrimaryKey(column)">
+                    </div>
                 </ng-template>
                 <label for="deleteCheck" *ngIf="modalGroup">Delete This Record?</label>
                 <input type="checkbox" name="deleteCheck" *ngIf="modalGroup" [formControlName]="'deleteCheck'" />
@@ -86,7 +90,8 @@
         </form>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-outline-primary" (click)="submitEditRecord()">Submit</button>
+        <p *ngIf="!modalGroup.value['primaryKey']">Please select a primary key to enable submission.</p>
+        <button type="button" class="btn btn-outline-primary" [disabled]="!modalGroup.value['primaryKey']" (click)="submitEditRecord()">Submit</button>
         <button type="button" class="btn btn-outline-primary" (click)="c('Close click')">Close</button>
     </div>
 </ng-template>
