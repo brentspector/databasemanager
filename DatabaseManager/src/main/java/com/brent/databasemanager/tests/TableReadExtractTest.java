@@ -71,7 +71,7 @@ public class TableReadExtractTest {
 		parameters.add("dbpass", "p4ssw0rd");
 		parameters.add("tableList", multiTableList);
 		assertThat(this.trt.postForObject("http://localhost:" + port + "/readTables", parameters, String.class))
-		.contains("\"name\":", "\"headers\":", "\"contents\":", "}]},{");;
+		.contains("\"name\":", "\"headers\":", "\"contents\":", "}]},{");
 	} //end validMultiTableRequestReturnsSuccess
 	
 	@Test

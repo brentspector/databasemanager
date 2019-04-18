@@ -86,7 +86,7 @@ public class TableToSQLConverter {
 			ArrayList<Map<String, String>> contents = tc.getContents();
 			String sql = "INSERT INTO " + tableName;	
 			insertContents(contents, tableName, columnTypes, dateFormats, 
-					timestampFormats, sql, rowIndexing);
+					timestampFormats, sql, rowIndexing);			
 			return objmap.writeValueAsString(new APIResponse(HttpStatus.OK, "Database table created successfully."));
 		} catch (JsonProcessingException e) {
 			throw new TTSCException("Unable to convert response to JSON.", e);
@@ -96,7 +96,14 @@ public class TableToSQLConverter {
 			throw new TTSCException("Malformed SQL caused from invalid data.", e);
 		} catch (SQLException e) {
 			throw new TTSCException("An error occurred while working with database. Please verify credentials.", e);
-		} //end try-catch block
+		} finally {
+			//Return connection
+			try {
+				conn.endConnection();
+			} catch (SQLException e) {
+				throw new TTSCException("Error while closing the connection.", e);
+			} //end try-catch block
+		} //end try-catch-finally block
 	} //end constructTable
 
 	private void validateTable(String tableName, DatabaseMetaData meta) throws SQLException

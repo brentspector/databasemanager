@@ -67,6 +67,7 @@ public class TableReader {
 				//Assign values to new TableContents
 				TableContents tableContents = new TableContents();
 				tableContents.setName(s);
+				tableContents.getKeys().addAll(conn.getRecordIDColumn(s));
 				tableContents.getHeaders().addAll(tableHeaders);
 				tableContents.setContents(newTableData);
 				tc.add(tableContents);
@@ -82,7 +83,14 @@ public class TableReader {
 			throw new TableReadException("Error while converting to JSON.",e);
 		} catch (IOException e) {
 			throw new TableReadException("Unable to convert list of tables.", e);
-		} //end try-catch block
+		} finally {	
+			//Return connection
+			try {
+				conn.endConnection();
+			} catch (SQLException e) {
+				throw new TableReadException("Error while closing the connection.", e);
+			} //end try-catch block
+		} //end try-catch-finally block
 	} //end tableData
 
 	public String pullTableList(String url, String user, String pass) {
@@ -95,8 +103,7 @@ public class TableReader {
 			ArrayList<Object> tableList = new ArrayList<Object>();
 			for(Map<String, Object> m:tableResult) {
 				tableList.addAll(m.values());
-			} //end for
-
+			} //end for			
 			return objmap.writeValueAsString(tableList);
 		} catch (SQLRecoverableException e) {
 			throw new TableReadException("Connection to target db failed. Please verify connection details.");
@@ -104,6 +111,13 @@ public class TableReader {
 			throw new TableReadException("Error getting database details.", e);
 		} catch (JsonProcessingException e) {
 			throw new TableReadException("Error while mapping JSON.", e);
-		} //end try-catch block
+		} finally {
+			//Return connection
+			try {
+				conn.endConnection();
+			} catch (SQLException e) {
+				throw new TableReadException("Error while closing the connection.",e);
+			} //end try-catch block
+		} //end try-catch-finally block
 	} //end pullTableList
 } //end TableReader

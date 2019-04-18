@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.brent.databasemanager.pojo.APIResponse;
 import com.brent.databasemanager.pojo.FileParseException;
 import com.brent.databasemanager.pojo.ObjectStorageException;
+import com.brent.databasemanager.pojo.RecordManagerException;
 import com.brent.databasemanager.pojo.STTFException;
 import com.brent.databasemanager.pojo.TTSCException;
 import com.brent.databasemanager.pojo.TableReadException;
@@ -77,6 +78,11 @@ public class RESTErrorHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleTableReadException(TableReadException ex) {
 		return buildResponseEntity(new APIResponse(HttpStatus.BAD_REQUEST, ex.getMessage()));
 	} //end handleTableReadException
+	
+	@ExceptionHandler(RecordManagerException.class)
+	protected ResponseEntity<Object> handleRecordManagerException(RecordManagerException ex) {
+		return buildResponseEntity(new APIResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), ex));
+	} //end handleRecordManagerException
 	
 	@ExceptionHandler(Throwable.class)
 	protected ResponseEntity<Object> handleThrowable(Throwable ex) {

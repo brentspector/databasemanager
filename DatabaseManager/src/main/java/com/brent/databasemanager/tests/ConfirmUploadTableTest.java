@@ -45,24 +45,36 @@ public class ConfirmUploadTableTest {
 	
 	@BeforeClass
 	public static void setUp() {
-		fileName = "1537996397501.ser";
+		//fileName = "1537996397501.ser";
+		fileName = "1545682840528.ser";
 		fileName2 = "1539211107121.ser";
 		tableMap = new HashMap<String, String>();
 		tableMap2 = new HashMap<String, String>();
 		badTableColumnNameMap = new HashMap<String, String>();
 		badTableColumnTypeMap = new HashMap<String, String>();
 		tablesToDrop = new ArrayList<String>();
-		tableMap.put("Clan", "Text");
-		tableMap.put("Carte", "Text");
-		tableMap.put("Nombre", "Number");
-		tableMap.put("Nombrevar1", "4");
-		tableMap.put("Nombrevar2", "0");
-		tableMap.put("PrixUnitaire", "Number");
-		tableMap.put("PrixUnitairevar1", "10");
-		tableMap.put("PrixUnitairevar2", "0");
-		tableMap.put("PrixTotal", "Number");
-		tableMap.put("PrixTotalvar1", "10");
-		tableMap.put("PrixTotalvar2", "0");
+//		tableMap.put("Clan", "Text");
+//		tableMap.put("Carte", "Text");
+//		tableMap.put("Nombre", "Number");
+//		tableMap.put("Nombrevar1", "4");
+//		tableMap.put("Nombrevar2", "0");
+//		tableMap.put("PrixUnitaire", "Number");
+//		tableMap.put("PrixUnitairevar1", "10");
+//		tableMap.put("PrixUnitairevar2", "0");
+//		tableMap.put("PrixTotal", "Number");
+//		tableMap.put("PrixTotalvar1", "10");
+//		tableMap.put("PrixTotalvar2", "0");
+		tableMap.put("zipcode", "Number");
+		tableMap.put("zipcodevar1", "10");
+		tableMap.put("zipcodevar2", "0");
+		tableMap.put("state", "Text");
+		tableMap.put("county_code", "Number");
+		tableMap.put("county_codevar1", "10");
+		tableMap.put("county_codevar2", "0");
+		tableMap.put("name", "Text");
+		tableMap.put("rate_area", "Number");
+		tableMap.put("rate_areavar1", "10");
+		tableMap.put("rate_areavar2", "0");
 		tableMap2.put("id", "Number");
 		tableMap2.put("idvar2", "10");
 		tableMap2.put("idvar2", "0");
@@ -147,12 +159,13 @@ public class ConfirmUploadTableTest {
 		parameters.add("dburl", "localhost:1521/xe");
 		parameters.add("dbuser", "DBADMIN");
 		parameters.add("dbpass", "p4ssw0rd");
-		parameters.add("tablename", "TestNoRowSuccessTable");
+		//parameters.add("tablename", "TestNoRowSuccessTable");
+		parameters.add("tablename", "Zips");
 		parameters.add("tablerow", false);
 		parameters.add("tableColMap", tableMap);
 		assertThat(this.trt.postForObject("http://localhost:" + port + "/confirmUploadNewTable", parameters, String.class))
 		.contains("success");
-		tablesToDrop.add("TestNoRowSuccessTable");
+		//tablesToDrop.add("TestNoRowSuccessTable");
 	} //end validFileWithoutRowReturnsSuccess
 	
 	@Test
