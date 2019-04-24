@@ -100,7 +100,7 @@ public class SingleRecordModificationtTest {
 	@Test
 	public void contextLoads() throws Exception {
 		assertThat(mr).isNotNull();
-	}
+	} //end contextLoads
 	
 	@Test
 	public void addValidRecordReturnsSuccess() throws Exception {

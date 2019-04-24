@@ -45,8 +45,9 @@ public class ManageRecord {
 	@PostMapping("/massFileEditRecords")
 	public String massFileEditTableRecords(@RequestParam("dburl") String url, @RequestParam("dbuser") String user, 
 			@RequestParam("dbpass") String pass, @RequestParam("tablename") String tableName,
-			@RequestParam("file") MultipartFile records, @RequestParam("fileType") String fileType) {
-		return mrmf.editRecordsInTable(url, user, pass, tableName, records, fileType);
+			@RequestParam("file") MultipartFile records, @RequestParam("fileType") String fileType,
+			@RequestParam("primaryKey") String primaryKeyList) {
+		return mrmf.editRecordsInTable(url, user, pass, tableName, records, fileType, primaryKeyList);
 	} //end massFileEditTableRecords
 	
 	@PostMapping("/massFileDeleteRecords")

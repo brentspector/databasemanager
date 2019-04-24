@@ -156,7 +156,7 @@ public class StringToTableFormatter {
 		for(Map.Entry<String, LinkedHashMap<String, String>> e:data.entrySet())
 		{
 			row = new HashMap<String, String>();
-			row.put("RecordID", e.getKey());
+			//row.put("RecordID", e.getKey());
 			for(String h:headers)
 			{
 				row.put(h, e.getValue().get(h));
@@ -167,7 +167,7 @@ public class StringToTableFormatter {
 		} //end record for
 		
 		//Add last header
-		tc.getHeaders().add(0, "RecordID");
+		//tc.getHeaders().add(0, "RecordID");
 		
 		//Return table contents
 		return tc;

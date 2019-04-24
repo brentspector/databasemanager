@@ -88,7 +88,7 @@ public class TableToSQLConverter {
 			//Insert table data
 			ArrayList<Map<String, String>> contents = tc.getContents();
 			String sql = "INSERT INTO " + tableName;	
-			insertContents(contents, tableName, columnTypes, dateFormats, 
+			insertContents(contents, columnTypes, dateFormats, 
 					timestampFormats, sql, rowIndexing);			
 			return objmap.writeValueAsString(new APIResponse(HttpStatus.OK, "Database table created successfully."));
 		} catch (JsonProcessingException e) {
@@ -127,9 +127,12 @@ public class TableToSQLConverter {
 			} //end if
 			
 			//Insert table data
+			System.out.println("Populate");
 			populateFormatsAndTypes(tableName, contents.get(0), dateFormats, timestampFormats, columnTypes);
-			contents = (ArrayList<Map<String, String>>) contents.subList(1, contents.size()-1);
-			insertContents(contents, tableName, columnTypes, dateFormats, timestampFormats, sql, false);
+			System.out.println("Contents");
+			contents.remove(0);
+			System.out.println("Insert");
+			insertContents(contents, columnTypes, dateFormats, timestampFormats, sql, false);
 			return objmap.writeValueAsString(new APIResponse(HttpStatus.OK, "Database table records added successfully."));
 		} catch (SQLRecoverableException e) {
 			throw new TTSCException("Connection to target db failed.", e);
@@ -169,9 +172,9 @@ public class TableToSQLConverter {
 			
 			//Modify table data
 			populateFormatsAndTypes(tableName, contents.get(0), dateFormats, timestampFormats, columnTypes);
-			contents = (ArrayList<Map<String, String>>) contents.subList(1, contents.size()-1);
-			updateRecords(contents, tableName, columnTypes, dateFormats, timestampFormats, keyList, sql);
-			return objmap.writeValueAsString(new APIResponse(HttpStatus.OK, "Database table records added successfully."));
+			contents.remove(0);
+			updateRecords(contents, columnTypes, dateFormats, timestampFormats, keyList, sql);
+			return objmap.writeValueAsString(new APIResponse(HttpStatus.OK, "Database table records updated successfully."));
 		} catch (SQLRecoverableException e) {
 			throw new TTSCException("Connection to target db failed.", e);
 		} catch (SQLDataException e) {
@@ -191,6 +194,48 @@ public class TableToSQLConverter {
 			} //end try-catch block
 		} //end try-catch-finally block
 	} //end editRecords
+	
+	public String deleteRecords(String url, String user, String pass, String tableName, TableContents tc) {
+		try {
+			//Check and initiate connection to database
+			conn.getConnection(url, user, pass);
+			
+			//Initialize objects
+			Map<String, String> columnTypes = new HashMap<String, String>();
+			Map<String, String> dateFormats = new HashMap<String, String>();
+			Map<String, String> timestampFormats = new HashMap<String, String>();
+			ArrayList<Map<String, String>> contents = tc.getContents();
+			String sql = "DELETE FROM " + tableName + " WHERE ";
+			
+			//Validate table
+			if(validateTable(tableName, conn.getMetaData())) {
+				throw new TTSCException("Table does not exist in database. Unable to add.");
+			} //end if
+			
+			//Remove table records
+			populateFormatsAndTypes(tableName, contents.get(0), dateFormats, timestampFormats, columnTypes);
+			contents.remove(0);
+			deleteRecords(contents, columnTypes, dateFormats, timestampFormats, sql);
+			return objmap.writeValueAsString(new APIResponse(HttpStatus.OK, "Database table records removed successfully."));
+		} catch (SQLRecoverableException e) {
+			throw new TTSCException("Connection to target db failed.", e);
+		} catch (SQLDataException e) {
+			throw new TTSCException("Malformed SQL caused from invalid data.", e);
+		} catch (SQLException e) {
+			throw new TTSCException("An error occurred while working with database. Please verify credentials.", e);
+		} catch (JsonProcessingException e) {
+			throw new TTSCException("Unable to convert response to JSON.", e);
+		} catch (IOException e) {
+			throw new TTSCException("Error on input data.", e);
+		} finally {
+			//Return connection
+			try {
+				conn.endConnection();
+			} catch (SQLException e) {
+				throw new TTSCException("Error while closing the connection.", e);
+			} //end try-catch block
+		} //end try-catch-finally block
+	} //end deleteRecords
 
 	private boolean validateTable(String tableName, DatabaseMetaData meta) throws SQLException
 	{
@@ -215,17 +260,26 @@ public class TableToSQLConverter {
 	private void populateFormatsAndTypes(String tableName, Map<String, String> formatList, 
 			Map<String, String> dateFormats, Map<String, String> timestampFormats, Map<String, String> columnTypes) {
 		try {
+			if(formatList.isEmpty() || formatList == null) {
+				return;
+			} //end if
+			System.out.println("Get types");
 			Map<String, Integer> tableColumns = conn.getTableColumnTypes(tableName);
 			formatList.forEach((k,v)->{
-				switch(tableColumns.get(k)) {
-				case Types.DATE:
-					dateFormats.put(k, (v == null ? "MM-DD-YYYY" : v));
-					break;
-				case Types.TIMESTAMP:
-					timestampFormats.put(k, v == null ? "MM-DD-YYYY HH24:MI:SS" : v);
-					break;
-				} //end switch
+				System.out.println("Format of " + k + " value " + v);
+				Integer type = tableColumns.get(k);
+				if(type != null) {
+					switch(type) {
+					case Types.DATE:
+						dateFormats.put(k, (v == null ? "MM-DD-YYYY" : v));
+						break;
+					case Types.TIMESTAMP:
+						timestampFormats.put(k, v == null ? "MM-DD-YYYY HH24:MI:SS" : v);
+						break;
+					} //end switch
+				} //end if
 			});
+			System.out.println("Table columns");
 			tableColumns.forEach((k,v)->{
 				columnTypes.put(k, String.valueOf(v));
 			});
@@ -307,7 +361,7 @@ public class TableToSQLConverter {
 	} //end createTable
 	
 	@SuppressWarnings("unchecked")
-	private void insertContents(ArrayList<Map<String, String>> contents, String tableName, 
+	private void insertContents(ArrayList<Map<String, String>> contents, 
 			Map<String, String> columnTypes, Map<String, String> dateFormats, 
 			Map<String, String> timestampFormats, String sql, boolean row) throws SQLException
 	{
@@ -324,130 +378,133 @@ public class TableToSQLConverter {
 			} //end if
 			m.forEach((k,v) -> {		
 				//key is Nombre and value is 1
-				switch(columnTypes.get(k)) 
-				{
-				case "Number":
-					sqlValues.add(Double.parseDouble((String) v));
-					sqlColumns.append(k + ",");
-					sqlParams.append("?,");
-					break;
-				case "91":
-					//Date fall-through
-				case "Date":
-					try {
-						DateTimeFormatter form = new DateTimeFormatterBuilder().appendPattern(
-								dateFormats.get(k)).toFormatter();
-						LocalDate ld = LocalDate.parse((CharSequence) v,form);
-						sqlValues.add(Date.valueOf(ld));
+				String type = columnTypes.get(k);
+				if(type != null) {
+					switch(type) 
+					{
+					case "Number":
+						sqlValues.add(Double.parseDouble((String) v));
 						sqlColumns.append(k + ",");
 						sqlParams.append("?,");
-					} catch (Exception e) {
-						e.printStackTrace();
-						throw new TTSCException("Your date format " + dateFormats.get(k) + 
-								" produced an error.", e);
-					} //end try-catch block Date
-					break;
-				case "93":
-					//Timestamp fall-through
-				case "DTime":
-					DateTimeFormatter form;
-					String pattern = timestampFormats.get(k);
-					try {
-						switch(pattern) {
-						case "YYYY-MM-DDTHH24:MI:SS":
-							form = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-							break;
-						default:
-							form = new DateTimeFormatterBuilder().appendPattern(
-								timestampFormats.get(k)).toFormatter();
-						} //end switch
-						LocalDateTime ldt = LocalDateTime.parse((CharSequence) v, form);
-						sqlValues.add(Timestamp.valueOf(ldt));
+						break;
+					case "91":
+						//Date fall-through
+					case "Date":
+						try {
+							DateTimeFormatter form = new DateTimeFormatterBuilder().appendPattern(
+									dateFormats.get(k)).toFormatter();
+							LocalDate ld = LocalDate.parse((CharSequence) v,form);
+							sqlValues.add(Date.valueOf(ld));
+							sqlColumns.append(k + ",");
+							sqlParams.append("?,");
+						} catch (Exception e) {
+							e.printStackTrace();
+							throw new TTSCException("Your date format " + dateFormats.get(k) + 
+									" produced an error.", e);
+						} //end try-catch block Date
+						break;
+					case "93":
+						//Timestamp fall-through
+					case "DTime":
+						DateTimeFormatter form;
+						String pattern = timestampFormats.get(k);
+						try {
+							switch(pattern) {
+							case "YYYY-MM-DDTHH24:MI:SS":
+								form = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+								break;
+							default:
+								form = new DateTimeFormatterBuilder().appendPattern(
+									timestampFormats.get(k)).toFormatter();
+							} //end switch
+							LocalDateTime ldt = LocalDateTime.parse((CharSequence) v, form);
+							sqlValues.add(Timestamp.valueOf(ldt));
+							sqlColumns.append(k + ",");
+							sqlParams.append("?,");
+						} catch (Exception e) {
+							e.printStackTrace();
+							throw new TTSCException("Your timestamp format " + timestampFormats.get(k) +
+									" produced an error.", e);
+						} //end try-catch block DTime
+						break;
+					case "-5":
+						//Bigint
+						try {
+							sqlValues.add(Long.valueOf((String)v));
+							sqlColumns.append(k + ",");
+							sqlParams.append("?,");
+						} catch (NullPointerException e) {
+							throw new RecordManagerException(k + " value was null when parsing to LONG.");
+						} catch (NumberFormatException e) {
+							throw new RecordManagerException(k + " could not parse " + v + " to LONG.", e);
+						} //end try-catch Long
+						break;
+					case "16":
+						//Boolean
+						sqlValues.add(Boolean.valueOf((String)v));
 						sqlColumns.append(k + ",");
 						sqlParams.append("?,");
-					} catch (Exception e) {
-						e.printStackTrace();
-						throw new TTSCException("Your timestamp format " + timestampFormats.get(k) +
-								" produced an error.", e);
-					} //end try-catch block DTime
-					break;
-				case "-5":
-					//Bigint
-					try {
-						sqlValues.add(Long.valueOf((String)v));
+						break;
+					case "8":
+						//Double
+						try {
+							sqlValues.add(Double.valueOf((String)v));
+							sqlColumns.append(k + ",");
+							sqlParams.append("?,");
+						} catch (NullPointerException e) {
+							throw new RecordManagerException(k + " value was null when parsing to DOUBLE.");
+						} catch (NumberFormatException e) {
+							throw new RecordManagerException(k + " could not parse " + v + " to DOUBLE.", e);
+						} //end try-catch Double
+						break;
+					case "6":
+						//Float
+						try {
+							sqlValues.add(Float.valueOf((String)v));
+							sqlColumns.append(k + ",");
+							sqlParams.append("?,");
+						} catch (NullPointerException e) {
+							throw new RecordManagerException(k + " value was null when parsing to FLOAT.");
+						} catch (NumberFormatException e) {
+							throw new RecordManagerException(k + " could not parse " + v + " to FLOAT.", e);
+						} //end try-catch Float
+						break;
+					case "4":
+						//Integer
+						try {
+							sqlValues.add(Integer.valueOf((String)v));
+							sqlColumns.append(k + ",");
+							sqlParams.append("?,");
+						} catch (NullPointerException e) {
+							throw new RecordManagerException(k + " value was null when parsing to INTEGER.");
+						} catch (NumberFormatException e) {
+							throw new RecordManagerException(k + " could not parse " + v + " to INTEGER.", e);
+						} //end try-catch Integer
+						break;
+					case "2":
+						//Numeric
+						try {
+							sqlValues.add(Double.valueOf((String)v));
+							sqlColumns.append(k + ",");
+							sqlParams.append("?,");
+						} catch (NullPointerException e) {
+							throw new RecordManagerException(k + " value was null when parsing to NUMERIC.");
+						} catch (NumberFormatException e) {
+							throw new RecordManagerException(k + " could not parse " + v + " to NUMERIC.", e);
+						} //end try-catch Numeric
+						break;
+					case "12":
+						//Varchar and Varchar2
+						sqlValues.add(String.valueOf(v));
 						sqlColumns.append(k + ",");
 						sqlParams.append("?,");
-					} catch (NullPointerException e) {
-						throw new RecordManagerException(k + " value was null when parsing to LONG.");
-					} catch (NumberFormatException e) {
-						throw new RecordManagerException(k + " could not parse " + v + " to LONG.", e);
-					} //end try-catch Long
-					break;
-				case "16":
-					//Boolean
-					sqlValues.add(Boolean.valueOf((String)v));
-					sqlColumns.append(k + ",");
-					sqlParams.append("?,");
-					break;
-				case "8":
-					//Double
-					try {
-						sqlValues.add(Double.valueOf((String)v));
+						break;
+					default:
+						sqlValues.add(v);			
 						sqlColumns.append(k + ",");
 						sqlParams.append("?,");
-					} catch (NullPointerException e) {
-						throw new RecordManagerException(k + " value was null when parsing to DOUBLE.");
-					} catch (NumberFormatException e) {
-						throw new RecordManagerException(k + " could not parse " + v + " to DOUBLE.", e);
-					} //end try-catch Double
-					break;
-				case "6":
-					//Float
-					try {
-						sqlValues.add(Float.valueOf((String)v));
-						sqlColumns.append(k + ",");
-						sqlParams.append("?,");
-					} catch (NullPointerException e) {
-						throw new RecordManagerException(k + " value was null when parsing to FLOAT.");
-					} catch (NumberFormatException e) {
-						throw new RecordManagerException(k + " could not parse " + v + " to FLOAT.", e);
-					} //end try-catch Float
-					break;
-				case "4":
-					//Integer
-					try {
-						sqlValues.add(Integer.valueOf((String)v));
-						sqlColumns.append(k + ",");
-						sqlParams.append("?,");
-					} catch (NullPointerException e) {
-						throw new RecordManagerException(k + " value was null when parsing to INTEGER.");
-					} catch (NumberFormatException e) {
-						throw new RecordManagerException(k + " could not parse " + v + " to INTEGER.", e);
-					} //end try-catch Integer
-					break;
-				case "2":
-					//Numeric
-					try {
-						sqlValues.add(Double.valueOf((String)v));
-						sqlColumns.append(k + ",");
-						sqlParams.append("?,");
-					} catch (NullPointerException e) {
-						throw new RecordManagerException(k + " value was null when parsing to NUMERIC.");
-					} catch (NumberFormatException e) {
-						throw new RecordManagerException(k + " could not parse " + v + " to NUMERIC.", e);
-					} //end try-catch Numeric
-					break;
-				case "12":
-					//Varchar and Varchar2
-					sqlValues.add(String.valueOf(v));
-					sqlColumns.append(k + ",");
-					sqlParams.append("?,");
-					break;
-				default:
-					sqlValues.add(v);			
-					sqlColumns.append(k + ",");
-					sqlParams.append("?,");
-				} //end switch
+					} //end switch
+				} //end if
 			}); //end forEach
 			sqlColumns.replace(sqlColumns.length()-1, sqlColumns.length(), ")");
 			sqlParams.replace(sqlParams.length()-1, sqlParams.length(), ")");
@@ -469,7 +526,7 @@ public class TableToSQLConverter {
 	} //end insertContents
 	
 	@SuppressWarnings("unchecked")
-	private void updateRecords(ArrayList<Map<String, String>> contents, String tableName, 
+	private void updateRecords(ArrayList<Map<String, String>> contents, 
 			Map<String, String> columnTypes, Map<String, String> dateFormats, 
 			Map<String, String> timestampFormats, ArrayList<String> primaryKeys, String sql) throws SQLException {
 	
@@ -649,11 +706,150 @@ public class TableToSQLConverter {
 				whereStatement.delete(0, whereStatement.length());
 				whereStatement.append("");
 			} catch (DataIntegrityViolationException e) {
-				throw new TTSCException("There was an error inserting the following: " + 
+				throw new TTSCException("There was an error updating the following: " + 
 						StringUtils.collectionToCommaDelimitedString(sqlValues), e);
 			} //end try-catch block
 		} //end for
 	} //end updateRecords
+	
+	@SuppressWarnings("unchecked")
+	private void deleteRecords(ArrayList<Map<String, String>> contents, 
+			Map<String, String> columnTypes, Map<String, String> dateFormats, 
+			Map<String, String> timestampFormats, String sql) throws SQLException {
+		
+		//Initialize objects
+		ArrayList<Object> sqlValues = new ArrayList<Object>();
+		StringBuilder sqlParams = new StringBuilder("");
+		
+		//Loop through contents and form each update
+		for(Map m: contents)
+		{
+			m.forEach((k,v) -> {		
+				//key is Nombre and value is 1
+				switch(columnTypes.get(k)) 
+				{
+				case "91":
+					//Date
+					try {
+						DateTimeFormatter form = new DateTimeFormatterBuilder().appendPattern(
+								dateFormats.get(k)).toFormatter();
+						LocalDate ld = LocalDate.parse((CharSequence) v,form);
+						sqlValues.add(Date.valueOf(ld));
+						sqlParams.append(k + " = ? AND");
+					} catch (Exception e) {
+						e.printStackTrace();
+						throw new TTSCException("Your date format " + dateFormats.get(k) + 
+								" produced an error.", e);
+					} //end try-catch block Date
+					break;
+				case "93":
+					//Timestamp
+					DateTimeFormatter form;
+					String pattern = timestampFormats.get(k);
+					try {
+						switch(pattern) {
+						case "YYYY-MM-DDTHH24:MI:SS":
+							form = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+							break;
+						default:
+							form = new DateTimeFormatterBuilder().appendPattern(
+								timestampFormats.get(k)).toFormatter();
+						} //end switch
+						LocalDateTime ldt = LocalDateTime.parse((CharSequence) v, form);
+						sqlValues.add(Timestamp.valueOf(ldt));
+						sqlParams.append(k + " = ? AND");
+					} catch (Exception e) {
+						e.printStackTrace();
+						throw new TTSCException("Your timestamp format " + timestampFormats.get(k) +
+								" produced an error.", e);
+					} //end try-catch block DTime
+					break;
+				case "-5":
+					//Bigint
+					try {
+						sqlValues.add(Long.valueOf((String)v));
+						sqlParams.append(k + " = ? AND");
+					} catch (NullPointerException e) {
+						throw new RecordManagerException(k + " value was null when parsing to LONG.");
+					} catch (NumberFormatException e) {
+						throw new RecordManagerException(k + " could not parse " + v + " to LONG.", e);
+					} //end try-catch Long
+					break;
+				case "16":
+					//Boolean
+					sqlValues.add(Boolean.valueOf((String)v));
+					sqlParams.append(k + " = ? AND");
+					break;
+				case "8":
+					//Double
+					try {
+						sqlValues.add(Double.valueOf((String)v));
+						sqlParams.append(k + " = ? AND");
+					} catch (NullPointerException e) {
+						throw new RecordManagerException(k + " value was null when parsing to DOUBLE.");
+					} catch (NumberFormatException e) {
+						throw new RecordManagerException(k + " could not parse " + v + " to DOUBLE.", e);
+					} //end try-catch Double
+					break;
+				case "6":
+					//Float
+					try {
+						sqlValues.add(Float.valueOf((String)v));
+						sqlParams.append(k + " = ? AND");
+					} catch (NullPointerException e) {
+						throw new RecordManagerException(k + " value was null when parsing to FLOAT.");
+					} catch (NumberFormatException e) {
+						throw new RecordManagerException(k + " could not parse " + v + " to FLOAT.", e);
+					} //end try-catch Float
+					break;
+				case "4":
+					//Integer
+					try {
+						sqlValues.add(Integer.valueOf((String)v));
+						sqlParams.append(k + " = ? AND");
+					} catch (NullPointerException e) {
+						throw new RecordManagerException(k + " value was null when parsing to INTEGER.");
+					} catch (NumberFormatException e) {
+						throw new RecordManagerException(k + " could not parse " + v + " to INTEGER.", e);
+					} //end try-catch Integer
+					break;
+				case "2":
+					//Numeric
+					try {
+						sqlValues.add(Double.valueOf((String)v));
+						sqlParams.append(k + " = ? AND");
+					} catch (NullPointerException e) {
+						throw new RecordManagerException(k + " value was null when parsing to NUMERIC.");
+					} catch (NumberFormatException e) {
+						throw new RecordManagerException(k + " could not parse " + v + " to NUMERIC.", e);
+					} //end try-catch Numeric
+					break;
+				case "12":
+					//Varchar and Varchar2
+					sqlValues.add(String.valueOf(v));
+					sqlParams.append(k + " = ? AND");
+					break;
+				default:
+					sqlValues.add(v);			
+					sqlParams.append(k + " = ? AND");
+				} //end switch
+			}); //end forEach
+			
+			//Trim parameters
+			sqlParams.replace(sqlParams.length()-5, sqlParams.length(), "");	
+						
+			try {
+				conn.executePreparedStatement(
+						sql + sqlParams, sqlValues.toArray());
+				sqlValues.clear();
+				sqlParams.delete(0, sqlParams.length());
+				sqlParams.append("");
+			} catch (DataIntegrityViolationException e) {
+				throw new TTSCException("There was an error updating the following: " + 
+						StringUtils.collectionToCommaDelimitedString(sqlValues), e);
+			} //end try-catch block
+		} //end for
+	} //end deleteRecords
 } //end TableToSQLConverter class
 
 

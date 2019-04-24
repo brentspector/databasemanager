@@ -25,7 +25,7 @@ public class MassRecordsManagerWithFile {
 	public String addRecordsToTable(String url, String user, String pass, String tableName, MultipartFile records, String fileType) {		
 		//Parse the file
 		TableContents tc = fp.parseNewTableContents(records, fileType);
-			
+		System.out.println("Parsed");	
 		//Add contents to table
 		return ttsc.addRecords(url, user, pass, tableName, tc);			
 	} //end addRecordsToTable
@@ -43,6 +43,7 @@ public class MassRecordsManagerWithFile {
 		//Parse the file
 		TableContents tc = fp.parseNewTableContents(records, fileType);
 		
-		return "";
+		//Delete records in table
+		return ttsc.deleteRecords(url, user, pass, tableName, tc);
 	} //end deleteRecordsFromTable
 } //end MassRecordsManagerWithFile
