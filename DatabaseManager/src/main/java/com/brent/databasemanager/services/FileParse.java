@@ -45,9 +45,8 @@ public class FileParse {
 	@Autowired
 	ObjectMapper objmap;
 	
-	//Parses a given file as new table contents
+	//Parses a given file as new table and new records
 	public String[] parseNewTableUpload(MultipartFile file, String type) {
-		
 		try {
 			String fileType = parseType(file.getOriginalFilename(), type);
 			switch(fileType) {
@@ -68,6 +67,29 @@ public class FileParse {
 			throw new FileParseException("The file provided encountered input issues", e);
 		} //end try-catch block
 	} // end parseNewTableUpload method
+	
+	//Parses a given file and returns records
+	public TableContents parseNewTableContents(MultipartFile file, String type) {
+		try {
+			String fileType = parseType(file.getOriginalFilename(), type);
+			switch(fileType) {
+			case "CSV":
+				uFile.setContents(parseContents(file));
+				tc = sttf.formatCSVContents(uFile.getContents());
+				return tc;
+			case "INI":
+				uFile.setContents(parseContents(file));
+				tc = sttf.formatINIContents(uFile.getContents());
+				return tc;
+			case "TXT":
+				throw new FileParseException("To upload TXT documents, please specify the format type");
+			default:
+				throw new FileParseException("Your file " + fileType + " is in a format that is not supported");
+			} //end switch		
+		} catch (IOException e) {
+			throw new FileParseException("The file provided encountered input issues", e);
+		} //end try-catch block
+	} //end parseNewtableContents
 
 	//Gets file type based on submitted file
 	private String parseType(String fileName, String type) 

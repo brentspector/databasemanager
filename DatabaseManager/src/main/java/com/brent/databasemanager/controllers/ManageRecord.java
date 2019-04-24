@@ -45,22 +45,22 @@ public class ManageRecord {
 	@PostMapping("/massFileEditRecords")
 	public String massFileEditTableRecords(@RequestParam("dburl") String url, @RequestParam("dbuser") String user, 
 			@RequestParam("dbpass") String pass, @RequestParam("tablename") String tableName,
-			@RequestParam("file") MultipartFile records) {
-		return mrmf.editRecordsInTable(url, user, pass, tableName, records);
+			@RequestParam("file") MultipartFile records, @RequestParam("fileType") String fileType) {
+		return mrmf.editRecordsInTable(url, user, pass, tableName, records, fileType);
 	} //end massFileEditTableRecords
 	
 	@PostMapping("/massFileDeleteRecords")
 	public String massFileDeleteTableRecords(@RequestParam("dburl") String url, @RequestParam("dbuser") String user, 
 			@RequestParam("dbpass") String pass, @RequestParam("tablename") String tableName,
-			@RequestParam("file") MultipartFile records) {
-		return mrmf.deleteRecordsFromTable(url, user, pass, tableName, records);
+			@RequestParam("file") MultipartFile records, @RequestParam("fileType") String fileType) {
+		return mrmf.deleteRecordsFromTable(url, user, pass, tableName, records, fileType);
 	} //end massFileDeleteTableRecords
 	
 	@PostMapping("/massFileAddRecords")
 	public String massFileAddTableRecords(@RequestParam("dburl") String url, @RequestParam("dbuser") String user, 
 			@RequestParam("dbpass") String pass, @RequestParam("tablename") String tableName,
-			@RequestParam("file") MultipartFile records) {
-		return mrmf.addRecordsToTable(url, user, pass, tableName, records);
+			@RequestParam("file") MultipartFile records, @RequestParam("fileType") String fileType) {
+		return mrmf.addRecordsToTable(url, user, pass, tableName, records, fileType);
 	} //end massFileAddTableRecords
 	
 	@PostMapping("/massColumnEditRecords")
